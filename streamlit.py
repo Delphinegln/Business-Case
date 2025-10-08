@@ -85,18 +85,22 @@ fig_bar.update_layout(yaxis_tickformat=".2%", xaxis_title=None, yaxis_title="Ren
 st.plotly_chart(fig_bar, use_container_width=True)
 
 # 📊 Graphique Plotly - Distribution des rendements
-returns_list = [assets[p].dropna().tolist() for p in presidents]
-labels = list(presidents.keys())
-# Filtrer listes trop courtes
-filtered_returns = [r for r in returns_list if len(r) > 1]
-filtered_labels = [l for r, l in zip(returns_list, labels) if len(r) > 1]
+returns_list = []
+labels = []
 
-if filtered_returns:
-    fig_dist = ff.create_distplot(filtered_returns, filtered_labels, show_hist=False, show_rug=False)
+for p in presidents:
+    if p in assets and not assets[p].empty:
+        returns_list.append(assets[p].dropna().tolist())
+        labels.append(p)
+
+# Vérifier qu'il reste au moins une série
+if returns_list:
+    fig_dist = ff.create_distplot(returns_list, labels, show_hist=False, show_rug=False)
     fig_dist.update_layout(title="🌍 Distribution des rendements mensuels")
     st.plotly_chart(fig_dist, use_container_width=True)
 else:
     st.warning("⚠️ Pas assez de données pour créer le graphique de distribution.")
+
 
 # 📊 Graphique Plotly - Volatilité glissante
 fig_vol = go.Figure()
