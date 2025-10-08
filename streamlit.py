@@ -135,24 +135,39 @@ with col2:
     ax.set_xlabel('Date')
     ax.set_ylabel('Volatilité')
     st.pyplot(fig)
-
 # 📊 Distribution interactive globale
-returns_list = [list(assets[p]) for p in presidents]  # <- conversion en liste
+
+# Convertir les rendements en listes simples
+returns_list = [list(assets[p]) for p in presidents]
 labels = list(presidents.keys())
 
-fig_dist = ff.create_distplot(
-    returns_list,
-    labels,
-    show_hist=False,
-    show_rug=False
-)
+# Filtrer les listes vides pour éviter les erreurs
+filtered_returns_list = []
+filtered_labels = []
 
-fig_dist.update_layout(
-    title='🌍 Distribution des rendements mensuels par président',
-    xaxis_title='Rendement mensuel'
-)
+for r, label in zip(returns_list, labels):
+    if len(r) > 0:
+        filtered_returns_list.append(r)
+        filtered_labels.append(label)
 
-st.plotly_chart(fig_dist, use_container_width=True)
+# Vérifier qu'il reste au moins une série avant de créer le graphique
+if len(filtered_returns_list) == 0:
+    st.warning("⚠️ Aucune donnée disponible pour créer le graphique de distribution.")
+else:
+    fig_dist = ff.create_distplot(
+        filtered_returns_list,
+        filtered_labels,
+        show_hist=False,
+        show_rug=False
+    )
+
+    fig_dist.update_layout(
+        title='🌍 Distribution des rendements mensuels par président',
+        xaxis_title='Rendement mensuel'
+    )
+
+    st.plotly_chart(fig_dist, use_container_width=True)
+
 
 
 # 📊 Volatilité glissante interactive
