@@ -160,12 +160,16 @@ for name in presidents:
 fig_vol.update_layout(title='Volatilité glissante sur 12 mois - Comparaison par président', xaxis_title='Date', yaxis_title='Volatilité')
 st.plotly_chart(fig_vol, use_container_width=True)
 
-# ✍️ Conclusion
-st.markdown("""
----
-### 🧠 Conclusion
-Cette étude met en lumière les différences de performance et de volatilité du **CAC40** selon les présidences françaises 🇫🇷.  
-Même si certaines périodes présentent des variations marquées, **les différences statistiques ne sont pas toujours significatives**.  
+# ✍️ Analyse contextuelle par président
+st.header("📖 Analyse des performances par président")
 
-📚 *Source des données : Yahoo Finance*
-""")
+analyse_text = """
+- **Jacques Chirac (1995-2006, bleu)** : La période montre une croissance relativement stable avec une volatilité modérée. La bulle internet (2000) a provoqué une forte fluctuation à court terme, visible dans les pics de volatilité.
+- **Nicolas Sarkozy (2007-2011, vert)** : On observe un rendement moyen plus faible et une volatilité très élevée pendant la crise financière de 2008. Les rendements mensuels sont plus dispersés.
+- **François Hollande (2012-2016, orange)** : Rendements plus stables que sous Sarkozy, mais le CAC40 reste relativement plat. La volatilité est moins prononcée, et les distributions sont moins extrêmes.
+- **Emmanuel Macron (2017-2024, rouge)** : La période est marquée par une forte hausse du CAC40 initialement, puis des fluctuations importantes dues à la pandémie Covid-19 (2020) et à la crise énergétique (2022). Les pics de volatilité et les distributions de rendement sont très visibles.
+- **Conclusion générale** : Les différences de rendement moyen ne sont pas toujours statistiquement significatives, mais les graphiques montrent clairement que certains événements macroéconomiques ou crises mondiales impactent fortement la volatilité et la distribution des rendements.
+"""
+
+st.markdown(analyse_text)
+
