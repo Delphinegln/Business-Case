@@ -86,10 +86,28 @@ else:
 
 # 📊 Visualisation synthétique des rendements moyens
 st.header("📉 Moyenne des rendements mensuels par président")
-fig_bar = px.bar(df_summary, x='President', y='Mean Return',
-                 color='President', title="Rendement mensuel moyen par président 🇫🇷",
-                 text_auto='.2%')
-st.plotly_chart(fig_bar, use_container_width=True)
+
+# 🔍 Vérification des données
+st.write("🧾 Aperçu des données résumées :")
+st.dataframe(df_summary.round(4), use_container_width=True)
+
+# Si la colonne Mean Return est vide, on le signale
+if df_summary['Mean Return'].isnull().all():
+    st.warning("⚠️ Aucune donnée de rendement moyen disponible. Vérifie la connexion Yahoo Finance.")
+else:
+    # ✅ Graphique corrigé et formaté
+    fig_bar = px.bar(
+        df_summary,
+        x='President',
+        y='Mean Return',
+        color='President',
+        title='📊 Rendement mensuel moyen par président 🇫🇷'
+    )
+
+    fig_bar.update_traces(texttemplate='%{y:.2%}', textposition='outside')
+    fig_bar.update_layout(yaxis_tickformat=".2%", xaxis_title=None, yaxis_title="Rendement moyen")
+
+    st.plotly_chart(fig_bar, use_container_width=True)
 
 # 🔍 Détails par président
 st.header("🔎 Détails par président")
