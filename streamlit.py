@@ -110,25 +110,20 @@ selected_president = st.selectbox("Choisir un président :", list(presidents.key
 returns = assets[selected_president]
 color = presidents[selected_president]['color']
 
-col1, col2 = st.columns(2)
+# Distribution interactive avec Plotly
+st.markdown(f"### 📦 Distribution des rendements mensuels ({selected_president})")
+fig_dist_pres = ff.create_distplot([returns.values.tolist()], [selected_president], show_hist=True, show_rug=False)
+fig_dist_pres.update_layout(title=f'🌍 Distribution interactive - {selected_president}', xaxis_title='Rendement mensuel')
+st.plotly_chart(fig_dist_pres, use_container_width=True)
 
-with col1:
-    st.markdown(f"### 📦 Distribution des rendements mensuels ({selected_president})")
-    fig, ax = plt.subplots(figsize=(7, 3))
-    ax.hist(returns, bins=20, color=color, alpha=0.7)
-    ax.set_title(f'Distribution des rendements mensuels - {selected_president}')
-    ax.set_xlabel('Rendement mensuel')
-    ax.set_ylabel('Fréquence')
-    st.pyplot(fig)
+# Volatilité glissante interactive avec Plotly
+st.markdown(f"### 📉 Volatilité glissante sur 12 mois ({selected_president})")
+rolling_vol = returns.rolling(window=12).std()
+fig_vol_pres = go.Figure()
+fig_vol_pres.add_trace(go.Scatter(x=rolling_vol.index, y=rolling_vol.values, mode='lines', name=selected_president, line=dict(color=color)))
+fig_vol_pres.update_layout(title=f'📉 Volatilité interactive - {selected_president}', xaxis_title='Date', yaxis_title='Volatilité')
+st.plotly_chart(fig_vol_pres, use_container_width=True)
 
-with col2:
-    st.markdown(f"### 📉 Volatilité glissante sur 12 mois ({selected_president})")
-    fig, ax = plt.subplots(figsize=(7, 3))
-    ax.plot(returns.rolling(window=12).std(), color=color)
-    ax.set_title(f'Volatilité rolling 12 mois - {selected_president}')
-    ax.set_xlabel('Date')
-    ax.set_ylabel('Volatilité')
-    st.pyplot(fig)
 
 # 📊 Distribution interactive globale
 returns_list = [assets[p].values.tolist() for p in presidents if not assets[p].empty]
