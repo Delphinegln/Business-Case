@@ -67,7 +67,8 @@ for name, info in presidents.items():
 df_summary = pd.DataFrame(summary_stats)
 
 st.header("📈 Résumé statistique global")
-st.dataframe(df_summary.style.format("{:.4f}"), use_container_width=True)
+st.dataframe(df_summary.round(4), use_container_width=True)
+
 
 # 🧪 Comparaisons statistiques
 anova = stats.f_oneway(*[assets[p] for p in presidents])
