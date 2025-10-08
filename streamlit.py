@@ -152,12 +152,41 @@ for name in presidents:
 fig_vol.update_layout(title='Volatilité glissante sur 12 mois - Comparaison par président', xaxis_title='Date', yaxis_title='Volatilité')
 st.plotly_chart(fig_vol, use_container_width=True)
 
-# ✍️ Conclusion
-st.markdown("""
----
-### 🧠 Conclusion
-Cette étude met en lumière les différences de performance et de volatilité du **CAC40** selon les présidences françaises 🇫🇷.  
-Même si certaines périodes présentent des variations marquées, **les différences statistiques ne sont pas toujours significatives**.  
+# ✍️ Analyse contextuelle détaillée par président
+st.header("📖 Analyse détaillée par président")
 
-📚 *Source des données : Yahoo Finance*
-""")
+analyse_text = """
+### Jacques Chirac (1995-2006, bleu)
+- La période montre une croissance globalement stable du CAC40.
+- La bulle internet (2000-2002) provoque des pics de volatilité et des rendements négatifs ponctuels.
+- Rendements mensuels relativement concentrés autour de la moyenne, avec une skewness légèrement négative pendant la bulle.
+
+### Nicolas Sarkozy (2007-2011, vert)
+- Rendements plus faibles en moyenne et volatilité très élevée.
+- La crise financière de 2008 est clairement visible : chute brutale du CAC40 et volatilité maximale sur les graphiques interactifs.
+- Distribution des rendements très étalée, avec kurtosis élevée, indiquant des événements extrêmes fréquents.
+
+### François Hollande (2012-2016, orange)
+- Rendements moyens légèrement positifs mais stabilité plus forte que sous Sarkozy.
+- Les fluctuations restent modérées, sans choc systémique majeur.
+- Les graphiques montrent que le marché se stabilise après la crise financière, avec moins d’extrêmes dans la distribution des rendements.
+
+### Emmanuel Macron (2017-2024, rouge)
+- Début de mandat marqué par une forte hausse du CAC40.
+- Crises ponctuelles importantes : pandémie Covid-19 (2020) et crise énergétique (2022) causent des pics de volatilité et des rendements mensuels très dispersés.
+- Les graphiques interactifs permettent de visualiser clairement l’impact de ces événements sur la volatilité et la distribution.
+
+---
+
+### 🔹 Conclusion générale
+- Les rendements moyens ne montrent pas toujours de différences statistiquement significatives entre présidents, mais les **graphiques interactifs révèlent la dynamique réelle du marché**.
+- Les périodes de crise (dotcom, 2008, Covid-19, énergie 2022) sont les principaux facteurs de volatilité et d’écarts de rendement.
+- Les présidences avec moins de crises visibles (Chirac, Hollande) ont des distributions plus concentrées et une volatilité moindre.
+- L’étude démontre que l’analyse visuelle et interactive complète parfaitement les statistiques classiques, et permet de comprendre le **contexte macroéconomique et ses effets sur le marché**.
+- Cette approche peut être utilisée pour des analyses comparatives sur d’autres indices ou périodes.
+
+📚 *Source des données : Yahoo Finance. Visualisations interactives réalisées avec Plotly.*
+"""
+
+st.markdown(analyse_text)
+
