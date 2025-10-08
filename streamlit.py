@@ -72,8 +72,13 @@ st.dataframe(df_summary.round(4), use_container_width=True)
 
 # 🧪 Comparaisons statistiques
 anova = stats.f_oneway(*[assets[p] for p in presidents])
-st.subheader("📊 Test ANOVA entre les présidences")
-st.write(f"**F-statistic:** {anova.statistic:.3f} | **p-value:** {anova.pvalue:.3f}")
+
+# Convertir en float si c’est un array
+f_stat = float(anova.statistic) if hasattr(anova.statistic, "__len__") else anova.statistic
+p_val = float(anova.pvalue) if hasattr(anova.pvalue, "__len__") else anova.pvalue
+
+st.write(f"**F-statistic:** {f_stat:.3f} | **p-value:** {p_val:.3f}")
+
 if anova.pvalue <= 0.05:
     st.success("✅ Différence significative de rendement moyen entre au moins deux présidents.")
 else:
