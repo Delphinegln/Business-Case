@@ -135,24 +135,25 @@ with col2:
     ax.set_xlabel('Date')
     ax.set_ylabel('Volatilité')
     st.pyplot(fig)
+    
 # 📊 Distribution interactive globale
 
 # Convertir les rendements en listes simples
 returns_list = [list(assets[p]) for p in presidents]
 labels = list(presidents.keys())
 
-# Filtrer les listes vides pour éviter les erreurs
+# Filtrer les listes trop courtes (<2 points)
 filtered_returns_list = []
 filtered_labels = []
 
 for r, label in zip(returns_list, labels):
-    if len(r) > 0:
+    if len(r) >= 2:  # <- il faut au moins 2 points pour KDE
         filtered_returns_list.append(r)
         filtered_labels.append(label)
 
-# Vérifier qu'il reste au moins une série avant de créer le graphique
+# Vérifier qu'il reste au moins une série
 if len(filtered_returns_list) == 0:
-    st.warning("⚠️ Aucune donnée disponible pour créer le graphique de distribution.")
+    st.warning("⚠️ Aucune série de rendements suffisante pour créer le graphique de distribution.")
 else:
     fig_dist = ff.create_distplot(
         filtered_returns_list,
