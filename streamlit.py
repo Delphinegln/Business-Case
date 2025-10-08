@@ -33,7 +33,7 @@ summary_stats = []
 
 st.sidebar.header("⚙️ Paramètres de l’étude")
 ticker = st.sidebar.text_input("Indice boursier :", "^FCHI", help="Par défaut : CAC40 (^FCHI)")
-interval = st.sidebar.selectbox("Fréquence :", ["1mo", "1wk", "1d"], index=0)
+interval = st.sidebar.selectbox("Fréquence :", ["Mois", "Semaine", "Jour"], index=0)
 
 st.sidebar.markdown("---")
 st.sidebar.info("💡 Conseil : tu peux modifier le ticker pour analyser un autre indice (ex: ^GSPC pour le S&P 500).")
