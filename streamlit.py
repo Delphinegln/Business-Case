@@ -32,11 +32,29 @@ assets = {}
 summary_stats = []
 
 st.sidebar.header("⚙️ Paramètres de l’étude")
-ticker = st.sidebar.text_input("Indice boursier :", "^FCHI", help="Par défaut : CAC40 (^FCHI)")
-interval = st.sidebar.selectbox("Fréquence :", ["1mo", "1wk", "1d"], index=0)
+# 🧑‍💼 Paramètres du sidebar
+st.sidebar.header("⚙️ Paramètres de l’étude")
+
+# Menu déroulant pour choisir le ticker
+ticker_options = {
+    "CAC40 (^FCHI)": "^FCHI",
+    "S&P500 (^GSPC)": "^GSPC",
+    "Nasdaq (^IXIC)": "^IXIC",
+    "DAX (^GDAXI)": "^GDAXI"
+}
+selected_index = st.sidebar.selectbox(
+    "Choisir l'indice boursier :",
+    options=list(ticker_options.keys()),
+    index=0
+)
+ticker = ticker_options[selected_index]
+
+# Choix de la fréquence
+interval = st.sidebar.selectbox("Fréquence :", ["Mois", "Semaine", "Jour"], index=0)
 
 st.sidebar.markdown("---")
-st.sidebar.info("💡 Conseil : tu peux modifier le ticker pour analyser un autre indice (ex: ^GSPC pour le S&P 500).")
+st.sidebar.info("💡 Conseil : sélectionne un indice pour analyser ses performances selon les présidences.")
+
 
 # 🔄 Téléchargement et calcul des rendements
 for name, info in presidents.items():
