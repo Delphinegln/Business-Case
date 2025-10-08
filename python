@@ -1,0 +1,123 @@
+import pandas as pd
+import numpy as np
+import yfinance as yf
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# Paramètres
+presidents = {
+    'Jacques Chirac': {'start': '1995-01-01', 'end': '2006-12-31', 'color': 'blue'},
+    'Nicolas Sarkozy': {'start': '2007-01-01', 'end': '2011-12-31', 'color': 'green'},
+    'François Hollande': {'start': '2012-01-01', 'end': '2016-12-31', 'color': 'orange'},
+    'Emmanuel Macron': {'start': '2017-01-01', 'end': '2024-12-31', 'color': 'red'}
+}
+
+# Téléchargement et analyses
+assets = {}
+summary_stats = []
+
+for name, info in presidents.items():
+    data = yf.download('^FCHI', start=info['start'], end=info['end'], interval='1mo')['Close']
+    returns = data.pct_change().dropna()
+    vol = returns.std()
+    mean = returns.mean()
+    perf = ((data.iloc[-1] / data.iloc[0]) - 1)
+    sharpe = mean / vol
+    skew = returns.skew()
+    kurt = returns.kurt()
+    normal = stats.shapiro(returns)
+
+    summary_stats.append({
+        'President': name,
+        'Mean Return': mean,
+        'Volatility': vol,
+        'Total Performance': perf,
+        'Sharpe Ratio': sharpe,
+        'Skewness': skew,
+        'Kurtosis': kurt,
+        'Normality p-value': normal.pvalue
+    })
+
+    assets[name] = returns
+
+    # Distribution plot
+    plt.figure(figsize=(7,3))
+    plt.hist(returns, bins=20, color=info['color'], alpha=0.7)
+    plt.title(f'Distribution des rendements mensuels - {name}')
+    plt.xlabel('Rendement mensuel')
+    plt.ylabel('Fréquence')
+    plt.show()
+
+    # Rolling volatility plot
+    plt.figure(figsize=(7,3))
+    plt.plot(returns.rolling(window=12).std(), color=info['color'])
+    plt.title(f'Volatilité rolling 12 mois - {name}')
+    plt.xlabel('Date')
+    plt.ylabel('Volatilité')
+    plt.show()
+
+# Comparaisons statistiques
+anova = stats.f_oneway(*[assets[p] for p in presidents])
+print(f"ANOVA F-statistic: {anova.statistic[0]:.3f}, p-value: {anova.pvalue[0]:.3f}")
+if anova.pvalue <= 0.05:
+    print("Différence significative de rendement moyen entre au moins deux présidents.")
+else:
+    print("Pas de différence significative de rendement entre les présidents.")
+
+# Résumé statistique
+df_summary = pd.DataFrame(summary_stats)
+print(df_summary)
+
+# Visualisation synthétique
+plt.figure(figsize=(10,5))
+for name, info in presidents.items():
+    plt.bar(name, df_summary[df_summary['President']==name]['Mean Return'].values[0], color=info['color'])
+plt.title('Moyenne des rendements mensuels par président')
+plt.xlabel('Président')
+plt.ylabel('Rendement mensuel')
+plt.show()
+
+# graphique 
+import plotly.express as px
+
+# Extract the scalar value from the 'Mean Return' Series
+df_summary['Mean Return Value'] = df_summary['Mean Return'].apply(lambda x: x.iloc[0])
+
+fig = px.bar(df_summary, x='President', y='Mean Return Value', color='President',
+             title='Interactive Mean Monthly Returns by President')
+fig.show()
+
+import plotly.figure_factory as ff
+
+returns_list = [assets[p].iloc[:, 0] for p in presidents]
+labels = list(presidents.keys())
+
+fig = ff.create_distplot(returns_list, labels, show_hist=False, show_rug=False)
+
+fig.update_layout(
+    title='Interactive Distribution of Monthly Returns by President',
+    xaxis_title='Monthly Return'
+)
+
+fig.show()
+
+import plotly.graph_objects as go
+
+fig = go.Figure()
+
+for name, info in presidents.items():
+    returns = assets[name]
+    rolling_volatility = returns.rolling(window=12).std()
+    fig.add_trace(go.Scatter(x=rolling_volatility.index, y=rolling_volatility.iloc[:, 0], mode='lines', name=name, line=dict(color=info['color'])))
+
+fig.update_layout(
+    title='Interactive Rolling 12-Month Volatility by President',
+    xaxis_title='Date',
+    yaxis_title='Rolling Volatility'
+)
+
+fig.show()
+
+
+
+peux tu me convertir ce code en format stremlit pour importer le code sur gith hub, peux tu y rajouter des emoji, des sections chouette comme une présentation d'étude ?
