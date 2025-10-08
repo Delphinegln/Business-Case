@@ -138,7 +138,7 @@ with col2:
 
 # 📈 Distribution interactive globale
 st.header("🌍 Distribution interactive des rendements")
-returns_list = [assets[p] for p in presidents]
+returns_list = [assets[p].dropna().tolist() for p in presidents]
 labels = list(presidents.keys())
 
 fig_dist = ff.create_distplot(returns_list, labels, show_hist=False, show_rug=False)
