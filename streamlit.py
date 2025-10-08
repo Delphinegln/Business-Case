@@ -38,6 +38,7 @@ interval = st.sidebar.selectbox("Fréquence :", ["1mo", "1wk", "1d"], index=0)
 st.sidebar.markdown("---")
 st.sidebar.info("💡 Conseil : tu peux modifier le ticker pour analyser un autre indice (ex: ^GSPC pour le S&P 500).")
 
+# ⚡ Téléchargement des données
 for name, info in presidents.items():
     with st.spinner(f"Chargement des données pour {name}..."):
         data = yf.download(ticker, start=info['start'], end=info['end'], interval=interval)['Close']
@@ -69,7 +70,6 @@ df_summary = pd.DataFrame(summary_stats)
 st.header("📈 Résumé statistique global")
 st.dataframe(df_summary.round(4), use_container_width=True)
 
-
 # 🧪 Comparaisons statistiques
 anova = stats.f_oneway(*[assets[p] for p in presidents])
 
@@ -84,35 +84,76 @@ if anova.pvalue <= 0.05:
 else:
     st.warning("⚠️ Aucune différence significative de rendement moyen entre les présidences.")
 
-# 📊 Visualisation synthétique des rendements moyens
-st.header("📉 Moyenne des rendements mensuels par président")
+# ================================
+# 📊 Graphiques interactifs Plotly
+# ================================
+st.header("📈 Graphiques interactifs")
 
-# 🔍 Vérification des données
-st.write("🧾 Aperçu des données résumées :")
-st.dataframe(df_summary.round(4), use_container_width=True)
+# 1️⃣ Moyenne des rendements mensuels
+st.subheader("📉 Moyenne des rendements mensuels")
+fig_bar = px.bar(
+    df_summary,
+    x='President',
+    y='Mean Return',
+    color='President',
+    title='📊 Rendement mensuel moyen par président 🇫🇷'
+)
+fig_bar.update_traces(texttemplate='%{y:.2%}', textposition='outside')
+fig_bar.update_layout(yaxis_tickformat=".2%", xaxis_title=None, yaxis_title="Rendement moyen")
+st.plotly_chart(fig_bar, use_container_width=True)
 
-# Si la colonne Mean Return est vide, on le signale
-if df_summary['Mean Return'].isnull().all():
-    st.warning("⚠️ Aucune donnée de rendement moyen disponible. Vérifie la connexion Yahoo Finance.")
+# 2️⃣ Volatilité glissante interactive
+st.subheader("📉 Volatilité glissante (rolling 12 mois)")
+fig_vol = go.Figure()
+for name, info in presidents.items():
+    returns = assets[name]
+    rolling_volatility = returns.rolling(window=12).std()
+    fig_vol.add_trace(go.Scatter(
+        x=rolling_volatility.index,
+        y=rolling_volatility.values,  # <- Series to array
+        mode='lines',
+        name=name,
+        line=dict(color=info['color'])
+    ))
+
+fig_vol.update_layout(
+    title='Volatilité glissante sur 12 mois - Comparaison par président',
+    xaxis_title='Date',
+    yaxis_title='Volatilité'
+)
+st.plotly_chart(fig_vol, use_container_width=True)
+
+# 3️⃣ Distribution interactive des rendements
+st.subheader("🌍 Distribution des rendements mensuels")
+returns_list = [list(assets[p]) for p in presidents]
+labels = list(presidents.keys())
+
+# Filtrer les listes trop courtes (<2 points)
+filtered_returns_list = []
+filtered_labels = []
+for r, label in zip(returns_list, labels):
+    if len(r) >= 2:
+        filtered_returns_list.append(r)
+        filtered_labels.append(label)
+
+if len(filtered_returns_list) == 0:
+    st.warning("⚠️ Aucune série de rendements suffisante pour créer le graphique de distribution.")
 else:
-    # ✅ Graphique corrigé et formaté
-    fig_bar = px.bar(
-        df_summary,
-        x='President',
-        y='Mean Return',
-        color='President',
-        title='📊 Rendement mensuel moyen par président 🇫🇷'
+    fig_dist = ff.create_distplot(
+        filtered_returns_list,
+        filtered_labels,
+        show_hist=False,
+        show_rug=False
     )
+    fig_dist.update_layout(
+        title='🌍 Distribution des rendements mensuels par président',
+        xaxis_title='Rendement mensuel'
+    )
+    st.plotly_chart(fig_dist, use_container_width=True)
 
-    fig_bar.update_traces(texttemplate='%{y:.2%}', textposition='outside')
-    fig_bar.update_layout(yaxis_tickformat=".2%", xaxis_title=None, yaxis_title="Rendement moyen")
-
-    st.plotly_chart(fig_bar, use_container_width=True)
-
-# 🔍 Détails par président
+# 🔍 Détails par président avec matplotlib
 st.header("🔎 Détails par président")
 selected_president = st.selectbox("Choisir un président :", list(presidents.keys()))
-
 info = presidents[selected_president]
 returns = assets[selected_president]
 
@@ -135,56 +176,6 @@ with col2:
     ax.set_xlabel('Date')
     ax.set_ylabel('Volatilité')
     st.pyplot(fig)
-    
-# 📊 Distribution interactive globale
-
-# Convertir les rendements en listes simples
-returns_list = [list(assets[p]) for p in presidents]
-labels = list(presidents.keys())
-
-# Filtrer les listes trop courtes (<2 points)
-filtered_returns_list = []
-filtered_labels = []
-
-for r, label in zip(returns_list, labels):
-    if len(r) >= 2:  # <- il faut au moins 2 points pour KDE
-        filtered_returns_list.append(r)
-        filtered_labels.append(label)
-
-# Vérifier qu'il reste au moins une série
-if len(filtered_returns_list) == 0:
-    st.warning("⚠️ Aucune série de rendements suffisante pour créer le graphique de distribution.")
-else:
-    fig_dist = ff.create_distplot(
-        filtered_returns_list,
-        filtered_labels,
-        show_hist=False,
-        show_rug=False
-    )
-
-    fig_dist.update_layout(
-        title='🌍 Distribution des rendements mensuels par président',
-        xaxis_title='Rendement mensuel'
-    )
-
-    st.plotly_chart(fig_dist, use_container_width=True)
-
-
-
-# 📊 Volatilité glissante interactive
-st.header("📉 Volatilité glissante (12 mois)")
-fig_vol = go.Figure()
-for name, info in presidents.items():
-    returns = assets[name]
-    rolling_volatility = returns.rolling(window=12).std()
-    fig_vol.add_trace(go.Scatter(x=rolling_volatility.index, y=rolling_volatility, mode='lines', name=name, line=dict(color=info['color'])))
-
-fig_vol.update_layout(
-    title='Volatilité glissante sur 12 mois - Comparaison par président',
-    xaxis_title='Date',
-    yaxis_title='Volatilité'
-)
-st.plotly_chart(fig_vol, use_container_width=True)
 
 # ✍️ Conclusion
 st.markdown("""
