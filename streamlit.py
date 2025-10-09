@@ -173,7 +173,7 @@ analyse_text = """
 
 ---
 
-j'ai ce code mais pour certain graphique je n'ai pas de titre d'axe ce qui est difficile pour l'interpretation 
+ 
 
 ### 🔹 Conclusion générale
 - Les rendements moyens ne montrent pas toujours de différences statistiquement significatives entre présidents, mais les **graphiques interactifs révèlent la dynamique réelle du marché**.
